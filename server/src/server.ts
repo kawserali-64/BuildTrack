@@ -1,6 +1,7 @@
 import app from './app';
 import { config } from './config/env';
 import { connectDB, disconnectDB } from './config/db';
+import { seedAdmin } from './utils/seedAdmin';
 
 const startServer = async (): Promise<void> => {
   // Start Express HTTP listener immediately so server is always available
@@ -13,10 +14,12 @@ const startServer = async (): Promise<void> => {
     console.log(`===============================================`);
   });
 
-  // Connect to MongoDB asynchronously
-  connectDB().catch((err) => {
-    console.warn('[MongoDB] Connection initialization warning:', err.message);
-  });
+  // Connect to MongoDB then seed the first Admin account (idempotent)
+  connectDB()
+    .then(() => seedAdmin())
+    .catch((err) => {
+      console.warn('[MongoDB] Connection initialization warning:', err.message);
+    });
 
   // Graceful shutdown handling
   const shutdown = async (signal: string) => {
