@@ -1,0 +1,110 @@
+import {
+  Activity,
+  BarChart3,
+  Building2,
+  CalendarDays,
+  CheckSquare,
+  ClipboardList,
+  DollarSign,
+  FileText,
+  HardHat,
+  LayoutDashboard,
+  Package,
+  Receipt,
+  Settings,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
+import type { WorkspaceRole } from '@/lib/role-routing';
+
+export interface WorkspaceRoute {
+  path: string;
+  label: string;
+  icon: LucideIcon;
+  showInSidebar?: boolean;
+}
+
+const route = (
+  path: string,
+  label: string,
+  icon: LucideIcon,
+  showInSidebar = true,
+): WorkspaceRoute => ({ path, label, icon, showInSidebar });
+
+export const workspaceRoutes: Record<WorkspaceRole, WorkspaceRoute[]> = {
+  Admin: [
+    route('dashboard', 'Dashboard', LayoutDashboard),
+    route('users', 'All users', Users),
+    route('users/pending', 'Pending approvals', Users),
+    route('projects', 'Projects', Building2),
+    route('tasks', 'Tasks', CheckSquare),
+    route('contractors', 'Contractors', HardHat),
+    route('budgets', 'Budgets', DollarSign),
+    route('expenses', 'Expenses', Receipt),
+    route('materials', 'Materials', Package),
+    route('reports', 'Progress reports', ClipboardList),
+    route('analytics', 'Analytics', BarChart3),
+    route('settings', 'System settings', Settings),
+    route('profile', 'Profile settings', Users, false),
+    route('activity-logs', 'Activity logs', Activity),
+  ],
+  'Project Manager': [
+    route('dashboard', 'Dashboard', LayoutDashboard),
+    route('projects', 'My projects', Building2),
+    route('projects/create', 'Create project', Building2),
+    route('projects/:id', 'Project details', Building2, false),
+    route('tasks', 'Tasks', CheckSquare),
+    route('kanban', 'Kanban board', CheckSquare),
+    route('milestones', 'Milestones', CalendarDays),
+    route('contractors', 'Contractors', HardHat),
+    route('budgets', 'Budgets', DollarSign),
+    route('expenses', 'Expenses', Receipt),
+    route('materials', 'Materials', Package),
+    route('reports', 'Site reports', ClipboardList),
+    route('analytics', 'Analytics', BarChart3),
+    route('profile', 'Profile settings', Users, false),
+  ],
+  'Site Engineer': [
+    route('dashboard', 'Dashboard', LayoutDashboard),
+    route('projects', 'Assigned projects', Building2),
+    route('projects/:id', 'Project details', Building2, false),
+    route('tasks', 'Assigned tasks', CheckSquare),
+    route('daily-progress', 'Daily progress', ClipboardList),
+    route('material-usage', 'Material usage', Package),
+    route('material-requests', 'Material requests', Package),
+    route('site-reports', 'Site reports', FileText),
+    route('site-photos', 'Site photos', FileText),
+    route('delays', 'Delay reports', CalendarDays),
+    route('milestones', 'Milestones', CalendarDays),
+    route('profile', 'Profile settings', Users, false),
+  ],
+  'Finance Manager': [
+    route('dashboard', 'Dashboard', LayoutDashboard),
+    route('projects', 'Projects', Building2),
+    route('budgets', 'Budgets', DollarSign),
+    route('expenses', 'Expenses', Receipt),
+    route('expenses/create', 'Record expense', Receipt),
+    route('categories', 'Expense categories', Package),
+    route('transactions', 'Transactions', DollarSign),
+    route('budget-utilization', 'Budget utilization', BarChart3),
+    route('estimates', 'Estimated vs actual', BarChart3),
+    route('overruns', 'Budget overruns', BarChart3),
+    route('reports', 'Financial reports', ClipboardList),
+    route('analytics', 'Analytics', BarChart3),
+    route('profile', 'Profile settings', Users, false),
+  ],
+  Contractor: [
+    route('dashboard', 'Dashboard', LayoutDashboard),
+    route('projects', 'Assigned projects', Building2),
+    route('projects/:id', 'Project details', Building2, false),
+    route('tasks', 'Assigned tasks', CheckSquare),
+    route('tasks/:id', 'Task details', CheckSquare, false),
+    route('my-work', 'My work', HardHat),
+    route('progress', 'Progress updates', ClipboardList),
+    route('material-requests', 'Material requests', Package),
+    route('work-reports', 'Work reports', FileText),
+    route('deadlines', 'Deadlines', CalendarDays),
+    route('notifications', 'Notifications', Activity),
+    route('profile', 'Profile settings', Users, false),
+  ],
+};
