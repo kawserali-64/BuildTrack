@@ -1,16 +1,24 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import { toNodeHandler } from 'better-auth/node';
 import { config } from './config/env';
+import { auth } from './config/auth';
 import v1Routes from './routes';
+import { HttpError } from './utils/http-error';
 
 const app: Application = express();
 
-// Enable CORS for client-server communication
+// 1. CORS with credentials and trusted origins for client-server communication
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (curl, server-to-server) or matching CLIENT_URL
-      if (!origin || origin === config.clientUrl || origin === 'http://localhost:3000') {
+      const allowedOrigins = [
+        config.clientUrl,
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+      ];
+      // Allow requests with no origin (mobile apps, curl, server-to-server) or matching allowed list
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error(`CORS blocked request from origin: ${origin}`));
@@ -18,10 +26,14 @@ app.use(
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
   })
 );
 
+// 2. Mount Better Auth catch-all route BEFORE express.json() (Required by Better Auth)
+app.all('/api/auth/*', toNodeHandler(auth));
+
+// 3. Body parsers mounted AFTER Better Auth
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -43,10 +55,12 @@ app.use((req: Request, res: Response) => {
 
 // Centralized error handling middleware
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error('[Error Middleware]:', err.message);
-  res.status(500).json({
+  const isExpectedError = err instanceof HttpError;
+  const statusCode = isExpectedError ? err.statusCode : 500;
+  if (!isExpectedError) console.error('[Error Middleware]:', err);
+  res.status(statusCode).json({
     success: false,
-    message: err.message || 'Internal Server Error',
+    message: isExpectedError ? err.message : 'Internal Server Error',
   });
 });
 
