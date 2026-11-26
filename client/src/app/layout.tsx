@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
+import { Navbar } from '@/components/common/Navbar';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'BuildTrack - Construction Management Platform',
-  description: 'Enterprise Construction Project Management & Financial Tracking',
+  title: 'BuildTrack - Construction Project & Contractor Workflow',
+  description: 'Plan construction projects, assign contractor tasks, track deadlines, review progress, and manage material requests with BuildTrack.',
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <Navbar>{children}</Navbar>
+      </body>
     </html>
   );
 }
